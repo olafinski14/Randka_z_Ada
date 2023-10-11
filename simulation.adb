@@ -1,26 +1,27 @@
--- A skeleton of a program for an assignment in programming languages
--- The students should rename the tasks of producers, consumers, and the buffer
--- Then, they should change them so that they would fit their assignments
--- They should also complete the code with constructions that lack there
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO;
 with Ada.Numerics.Discrete_Random;
 
 
 procedure Simulation is
+
    Number_Of_Products: constant Integer := 5;
    Number_Of_Assemblies: constant Integer := 3;
    Number_Of_Consumers: constant Integer := 2;
+
    subtype Product_Type is Integer range 1 .. Number_Of_Products;
    subtype Assembly_Type is Integer range 1 .. Number_Of_Assemblies;
    subtype Consumer_Type is Integer range 1 .. Number_Of_Consumers;
+
    Product_Name: constant array (Product_Type) of String(1 .. 8)
      := ("Product1", "Product2", "Product3", "Product4", "Product5");
    Assembly_Name: constant array (Assembly_Type) of String(1 .. 9)
      := ("Assembly1", "Assembly2", "Assembly3");
+
    package Random_Assembly is new
      Ada.Numerics.Discrete_Random(Assembly_Type);
    type My_Str is new String(1 ..256);
+
 
    -- Producer produces determined product
    task type Producer is
@@ -28,12 +29,14 @@ procedure Simulation is
       entry Start(Product: in Product_Type; Production_Time: in Integer);
    end Producer;
 
+
    -- Consumer gets an arbitrary assembly of several products from the buffer
    task type Consumer is
       -- Give the Consumer an identity
       entry Start(Consumer_Number: in Consumer_Type;
-		    Consumption_Time: in Integer);
+                  Consumption_Time: in Integer);
    end Consumer;
+
 
    -- In the Buffer, products are assemblied into an assembly
    task type Buffer is
@@ -43,9 +46,11 @@ procedure Simulation is
       entry Deliver(Assembly: in Assembly_Type; Number: out Integer);
    end Buffer;
 
+
    P: array ( 1 .. Number_Of_Products ) of Producer;
    K: array ( 1 .. Number_Of_Consumers ) of Consumer;
    B: Buffer;
+
 
    task body Producer is
       subtype Production_Time_Range is Integer range 3 .. 6;
@@ -72,6 +77,7 @@ procedure Simulation is
 	 Product_Number := Product_Number + 1;
       end loop;
    end Producer;
+
 
    task body Consumer is
       subtype Consumption_Time_Range is Integer range 4 .. 8;
@@ -173,6 +179,7 @@ procedure Simulation is
 	 end if;
       end Can_Accept;
 
+
       function Can_Deliver(Assembly: Assembly_Type) return Boolean is
       begin
 	 for W in Product_Type loop
@@ -183,6 +190,7 @@ procedure Simulation is
 	 return True;
       end Can_Deliver;
 
+
       procedure Storage_Contents is
       begin
 	 for W in Product_Type loop
@@ -190,6 +198,7 @@ procedure Simulation is
 		       & Product_Name(W));
 	 end loop;
       end Storage_Contents;
+
 
    begin
       Put_Line("Buffer started");
@@ -226,12 +235,13 @@ procedure Simulation is
       end loop;
    end Buffer;
 
+
 begin
-   for I in 1 .. Number_Of_Products loop
-      P(I).Start(I, 10);
+   for Product in 1 .. Number_Of_Products loop
+      P(Product).Start(Product, 10);
    end loop;
-   for J in 1 .. Number_Of_Consumers loop
-      K(J).Start(J,12);
+   for Consumer in 1 .. Number_Of_Consumers loop
+      K(Consumer).Start(Consumer,12);
    end loop;
 end Simulation;
 
